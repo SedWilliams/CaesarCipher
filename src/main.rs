@@ -1,4 +1,4 @@
-use std::io;
+use std::env;
 
 struct Lists {
     list: Vec<char>,
@@ -6,12 +6,48 @@ struct Lists {
     output_list: String,
 }
 
+impl Lists {
+    fn new() -> Lists {
+        let lists: Lists = Lists { 
+             list: vec!['A', 'B', 'C', 'D',
+                'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                'W', 'X', 'Y', 'Z'
+            ],
+            shifted_list: vec!['A', 'B', 'C', 'D',
+                'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                'W', 'X', 'Y', 'Z'
+            ],
+            output_list: String::new(),
+        };
+
+        lists
+    }
+}
+
+struct Config {
+    num: i32,
+    message: String,
+}
+
+impl Config {
+    fn parse_config() -> Config {
+        let args: Vec<String> = env::args().collect();
+        let config: Config = Config { 
+            num: args[1].clone().trim().parse().expect("NaN foo"), 
+            message: args[2].clone(), 
+        };
+        config
+    }
+}
+
 fn shift(shifts: i32, shifted_list: &mut Lists) {
     for elements in 0..shifts {
         let moved_letter = shifted_list.shifted_list.remove(0);
         shifted_list.shifted_list.push(moved_letter);
     }
-    println!("{:?}", shifted_list.shifted_list);
+   // println!("{:?}", shifted_list.shifted_list);
 }
 
 fn return_letter_index(letter: char, alphabet: &mut Lists) -> usize {
@@ -29,9 +65,9 @@ fn return_letter_index(letter: char, alphabet: &mut Lists) -> usize {
 
 fn append_to_output(letter: char, lists: &mut Lists) {
     let index_in_alphabet = return_letter_index(letter, lists);
-    let encoded_character = lists.shifted_list[index_in_alphabet];
-    //let encoded_character = lists.shifted_list.get(index_in_alphabet).unwrap();
-    lists.output_list.push(encoded_character);
+    //let encoded_character = lists.shifted_list[index_in_alphabet];
+    let encoded_character = lists.shifted_list.get(index_in_alphabet).unwrap();
+    lists.output_list.push(*encoded_character);
 }
 
 fn encode(msg: String, output_list: &mut Lists) {
@@ -46,34 +82,12 @@ fn encode(msg: String, output_list: &mut Lists) {
 }
 
 fn main() {
-
-        let mut lists: Lists = Lists {
-             list: vec!['A', 'B', 'C', 'D',
-                'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                'W', 'X', 'Y', 'Z'
-            ],
-            shifted_list: vec!['A', 'B', 'C', 'D',
-                'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
-                'W', 'X', 'Y', 'Z'
-            ],
-            output_list: String::new(),
-        };
- 
-
-    {
-        let mut i: String = String::new();
-        println!("Input the number of desired shifts: ");
-        io::stdin().read_line(&mut i).expect("Failed input :(");
-        let input: i32 = i.trim().parse().expect("Not a valid ineger");
-        shift(input, &mut lists);
-    }
-
-    let mut i: String = String::new();
-    println!("Input a message to encode with your set # of shifts: ");
-    io::stdin().read_line(&mut i).expect("Not a valid string :(");
-    encode(i, &mut lists);
+    
+    let mut lists: Lists = Lists::new();
+    let config: Config = Config::parse_config();
+    shift(config.num, &mut lists);
+    encode(config.message, &mut lists);
+    
 }
 
 
